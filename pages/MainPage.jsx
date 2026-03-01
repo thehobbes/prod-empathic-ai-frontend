@@ -38,16 +38,16 @@ function MainPage() {
     <div className="flex h-screen bg-white font-sans overflow-hidden">
       
       {/* 1. LEFT SIDEBAR */}
-      <div className="w-64 bg-[#FAFAFA] flex flex-col h-full border-r border-gray-100 p-5 shrink-0">
+      <div className="w-64 bg-[#3F5546] flex flex-col h-full border-r border-[#526D5B] p-5 shrink-0 text-white">
         
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8 px-1">
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#4E9F76] to-[#2D6A4B]"></div>
-          <span className="font-bold text-xl text-gray-800">Orbital</span>
+          <span className="font-bold text-xl">Orbital</span>
         </div>
 
         {/* New Session Button */}
-        <button className="w-full bg-[#5BA87F] text-white rounded-full py-2.5 mb-6 font-medium shadow-sm hover:bg-[#4d916d] transition-colors flex items-center justify-center gap-2">
+        <button className="w-full bg-[#89B399] text-[#3F5546] rounded-full py-2.5 mb-6 font-medium shadow-sm hover:bg-[#76A086] transition-colors flex items-center justify-center gap-2">
           <span className="text-lg font-light">+</span> New Session
         </button>
 
@@ -58,35 +58,36 @@ function MainPage() {
               key={num} 
               className={`flex items-center justify-between px-4 py-2.5 rounded-2xl cursor-pointer transition-colors ${
                 num === 19 
-                  ? 'bg-[#E5EFE9] text-[#2C5F43] font-medium' 
-                  : 'text-gray-500 hover:bg-gray-100'
+                  ? 'bg-[#526D5B] text-white font-medium' 
+                  : 'text-gray-300 hover:bg-[#4A6351]'
               }`}
             >
               <span className="text-sm">Session {num}</span>
-              <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
           ))}
         </div>
 
         {/* Connection Status Panel */}
         <div className="mt-4 shrink-0">
+          {/* You might need to adjust colors inside ConnectionStatus for the dark theme */}
           <ConnectionStatus connection={mockConnection} />
         </div>
 
         {/* Footer (Logout) */}
-        <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between px-2 text-gray-500 shrink-0">
-          <button className="flex items-center gap-2 hover:text-gray-800 transition-colors">
+        <div className="mt-4 pt-4 border-t border-[#526D5B] flex items-center justify-between px-2 text-gray-300 shrink-0">
+          <button className="flex items-center gap-2 hover:text-white transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
             <span className="text-sm font-medium underline underline-offset-2">log out</span>
           </button>
-          <button className="hover:text-gray-800 transition-colors">
+          <button className="hover:text-white transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           </button>
         </div>
       </div>
 
       {/* 2. CENTER AREA (Visualizer & Voice Controls) */}
-      <div className="flex-1 flex flex-col items-center justify-between relative bg-white overflow-hidden pb-12">
+      <div className="flex-1 flex flex-col items-center justify-between relative bg-[#DDE8D5] overflow-hidden pb-12">
         
         {/* The 3D Orb (Now stacked above) */}
         <div className="w-full flex-1 flex items-center justify-center pt-10 min-h-[400px]">
@@ -103,19 +104,19 @@ function MainPage() {
       </div>
 
       {/* 3. RIGHT SIDEBAR (Dynamic Tab Interface) */}
-      <div className="w-[420px] bg-[#FAFAFA] flex flex-col h-full border-l border-gray-100 p-6 shrink-0">
+      <div className="w-[420px] bg-[#F4F3ED] flex flex-col h-full border-l border-[#E5E4DC] p-6 shrink-0">
         
         {/* Chat / Graph Toggle */}
-        <div className="flex bg-[#EFEFEF] p-1.5 rounded-full mb-6 shrink-0 relative">
+        <div className="flex bg-[#E5E4DC] p-1.5 rounded-full mb-6 shrink-0 relative">
           <button 
             onClick={() => setActiveTab('chat')}
-            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'chat' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'chat' ? 'bg-white text-[#3F5546] shadow-sm' : 'text-[#7A8C80] hover:text-[#3F5546]'}`}
           >
             Chat
           </button>
           <button 
             onClick={() => setActiveTab('graph')}
-            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'graph' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'graph' ? 'bg-white text-[#3F5546] shadow-sm' : 'text-[#7A8C80] hover:text-[#3F5546]'}`}
           >
             Knowledge Graph
           </button>

@@ -2,7 +2,8 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { MeshDistortMaterial, Environment, ContactShadows } from '@react-three/drei';
+// 1. Import OrbitControls here
+import { MeshDistortMaterial, Environment, ContactShadows, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 function AudioReactiveSphere({ audioLevel }) {
@@ -27,7 +28,7 @@ function AudioReactiveSphere({ audioLevel }) {
     <mesh ref={meshRef} castShadow receiveShadow>
       <sphereGeometry args={[1.5, 64, 64]} />
       <MeshDistortMaterial
-        color="#4a9eff"
+        color="#419a49"
         attach="material"
         distort={0 + audioLevel * 2}
         speed={2 + audioLevel * 3}
@@ -35,7 +36,7 @@ function AudioReactiveSphere({ audioLevel }) {
         metalness={0.2}
         // Add a slight emissive glow for audio
         emissive="#4a9eff"
-        emissiveIntensity={audioLevel * 0.2}
+        emissiveIntensity={audioLevel * 0.3}
       />
     </mesh>
   );
@@ -113,9 +114,9 @@ function AudioBubble() {
         </p>
       </div>
 
-      <div style={{ width: '100%', height: '500px' }}>
-        {/* 1. Enable shadows on the Canvas */}
-        <Canvas shadows camera={{ position: [0, 0, 5], fov: 50 }}>
+      <div style={{ width: '100%', height: '500px', cursor: 'grab' }}>
+        {/* Re-applied the camera zoom fix so the shadow doesn't clip! */}
+        <Canvas shadows camera={{ position: [0, 0, 6.5], fov: 50 }}>
           <ambientLight intensity={0.5} />
           
           {/* 2. Add a strong directional light to create highlights and shadows */}
@@ -129,17 +130,25 @@ function AudioBubble() {
 
           <AudioReactiveSphere audioLevel={audioLevel} />
           
-          {/* 4. Add realistic shadows underneath */}
+          {/* 4. Add realistic shadows underneath (with scale fix) */}
           <ContactShadows
-            position={[0, -2, 0]} // Fixed typo here (was [0, , 0])
+            position={[0, -2, 0]}
             opacity={0.5}
-            scale={10}
-            blur={2}
+            scale={8}
+            blur={2.5}
             far={4}
+            resolution={512}
           />
 
           {/* 5. Add an environment map for reflections */}
           <Environment preset="city" />
+
+          {/* 6. ADD ORBIT CONTROLS HERE */}
+          <OrbitControls 
+            enableZoom={false} 
+            enablePan={false} 
+            makeDefault 
+          />
         </Canvas>
       </div>
     </div>
