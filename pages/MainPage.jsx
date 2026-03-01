@@ -480,17 +480,26 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
     [eventForwarder.latestProsodyFrame?.prosodyScores],
   );
 
-  const audioLevel = useMemo(() => {
+const audioLevel = useMemo(() => {
     const micLevel = averageFftLevel(voice.micFft);
-    const assistantLevel = voice.isPlaying ? averageFftLevel(voice.fft) : 0;
+    
+    const rawAssistantFft = voice.playerFft || voice.fft || [];
+    
+    let assistantLevel = 0;
+    if (voice.isPlaying) {
+      const baseLevel = averageFftLevel(rawAssistantFft);
+      assistantLevel = Math.min((baseLevel * 2.5) + 0.1, 1);
+    }
+
     const targetLevel = Math.max(micLevel, assistantLevel);
     const previousLevel = smoothedAudioLevelRef.current;
-    const response = targetLevel > previousLevel ? 0.42 : 0.16;
+    const response = targetLevel > previousLevel ? 0.6 : 0.16;
+    
     const nextLevel = previousLevel + (targetLevel - previousLevel) * response;
-
     smoothedAudioLevelRef.current = nextLevel < 0.01 ? 0 : nextLevel;
+    
     return smoothedAudioLevelRef.current;
-  }, [voice.fft, voice.isPlaying, voice.micFft]);
+  }, [voice.fft, voice.playerFft, voice.isPlaying, voice.micFft]);
 
   const connection = useMemo(
     () => ({
@@ -609,10 +618,6 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
             {pageError}
           </div>
         ) : null}
-
-        <div className="mb-4">
-          <ProsodyPanel signals={latestSignals} />
-        </div>
 
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col gap-4">
           {activeTab === "chat" ? (

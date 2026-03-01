@@ -28,7 +28,7 @@ function AudioReactiveSphere({ audioLevel }) {
       <MeshDistortMaterial
         color="#419a49"
         attach="material"
-        distort={0 + audioLevel * 0.5}
+        distort={0.3 + audioLevel * 0.5}
         speed={2 + audioLevel * 3}
         roughness={0.5}
         metalness={0.2}

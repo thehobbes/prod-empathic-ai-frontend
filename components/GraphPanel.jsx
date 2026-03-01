@@ -38,7 +38,7 @@ export default function GraphPanel({ graph, selectedReceiptId }) {
   const renderModel = buildGraphRenderModel(graph, selectedReceiptId);
 
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm flex flex-col h-full min-h-[300px]">
+    <section className="rounded-xl border border-zinc-200 bg-white p-5 flex flex-col h-full min-h-[300px]">
       
       {/* Header section */}
       <div className="flex items-center justify-between mb-4">
