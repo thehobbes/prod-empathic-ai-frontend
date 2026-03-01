@@ -40,7 +40,7 @@ function AudioReactiveSphere({ audioLevel }) {
   );
 }
 
-function AudioBubble({ audioLevel = 0, micActive = false }) {
+function AudioBubble({ audioLevel, micActive = false }) {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-10 rounded-3xl">
       

@@ -135,6 +135,7 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
 
   const processedMessageCountRef = useRef(0);
   const smoothedAudioLevelRef = useRef(0);
+  const [backendAudioLevel, setBackendAudioLevel] = useState(0);
 
   const syncSessionsFromStorage = useCallback(() => {
     const storedSessions = listSessionRecords();
@@ -186,6 +187,11 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
     wsBaseUrl: deriveBackendWsBaseUrl(apiBaseUrl),
     onEnvelope: (envelope) => {
       applyEnvelope(normalizeBackendEnvelope(envelope));
+      // Extract audio level from backend envelope
+      if (envelope?.fft) {
+        const level = averageFftLevel(envelope.fft);
+        setBackendAudioLevel(level);
+      }
     },
     onError: (error) => {
       setPageError(error?.message ?? "The backend websocket failed.");
@@ -491,7 +497,8 @@ const audioLevel = useMemo(() => {
       assistantLevel = Math.min((baseLevel * 2.5) + 0.1, 1);
     }
 
-    const targetLevel = Math.max(micLevel, assistantLevel);
+    // Combine voice and backend audio levels
+    const targetLevel = Math.max(micLevel, assistantLevel, backendAudioLevel);
     const previousLevel = smoothedAudioLevelRef.current;
     const response = targetLevel > previousLevel ? 0.6 : 0.16;
     
@@ -499,7 +506,7 @@ const audioLevel = useMemo(() => {
     smoothedAudioLevelRef.current = nextLevel < 0.01 ? 0 : nextLevel;
     
     return smoothedAudioLevelRef.current;
-  }, [voice.fft, voice.playerFft, voice.isPlaying, voice.micFft]);
+  }, [voice.fft, voice.playerFft, voice.isPlaying, voice.micFft, backendAudioLevel]);
 
   const connection = useMemo(
     () => ({
