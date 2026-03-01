@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-// 1. Import OrbitControls here
 import { MeshDistortMaterial, Environment, ContactShadows, OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
 
 function AudioReactiveSphere({ audioLevel }) {
   const meshRef = useRef();
@@ -30,7 +28,7 @@ function AudioReactiveSphere({ audioLevel }) {
       <MeshDistortMaterial
         color="#419a49"
         attach="material"
-        distort={0 + audioLevel * 2}
+        distort={0 + audioLevel * 0.5}
         speed={2 + audioLevel * 3}
         roughness={0.5}
         metalness={0.2}
@@ -42,65 +40,7 @@ function AudioReactiveSphere({ audioLevel }) {
   );
 }
 
-function AudioBubble() {
-  const [audioLevel, setAudioLevel] = useState(0);
-  const [micActive, setMicActive] = useState(false);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const micStreamRef = useRef(null);
-  const animationFrameRef = useRef(null);
-
-  useEffect(() => {
-    const initAudio = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        micStreamRef.current = stream;
-        setMicActive(true);
-
-        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        analyserRef.current = audioContextRef.current.createAnalyser();
-        analyserRef.current.fftSize = 256;
-
-        const source = audioContextRef.current.createMediaStreamSource(stream);
-        source.connect(analyserRef.current);
-
-        analyzeAudio();
-      } catch (err) {
-        console.error("❌ Microphone access denied:", err);
-      }
-    };
-
-    const analyzeAudio = () => {
-      if (!analyserRef.current) return;
-
-      const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-      
-      const update = () => {
-        analyserRef.current.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-        const normalized = average / 255;
-        setAudioLevel(normalized);
-        animationFrameRef.current = requestAnimationFrame(update);
-      };
-      
-      update();
-    };
-
-    initAudio();
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (micStreamRef.current) {
-        micStreamRef.current.getTracks().forEach(track => track.stop());
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
-    };
-  }, []);
-
+function AudioBubble({ audioLevel = 0, micActive = false }) {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-10 rounded-3xl">
       
@@ -115,11 +55,8 @@ function AudioBubble() {
       </div>
 
       <div style={{ width: '100%', height: '500px', cursor: 'grab' }}>
-        {/* Re-applied the camera zoom fix so the shadow doesn't clip! */}
         <Canvas shadows camera={{ position: [0, 0, 6.5], fov: 50 }}>
           <ambientLight intensity={0.5} />
-          
-          {/* 2. Add a strong directional light to create highlights and shadows */}
           <directionalLight
             position={[5, 5, 5]}
             intensity={2}
@@ -127,10 +64,7 @@ function AudioBubble() {
             shadow-mapSize-width={1024}
             shadow-mapSize-height={1024}
           />
-
           <AudioReactiveSphere audioLevel={audioLevel} />
-          
-          {/* 4. Add realistic shadows underneath (with scale fix) */}
           <ContactShadows
             position={[0, -2, 0]}
             opacity={0.5}
@@ -140,10 +74,7 @@ function AudioBubble() {
             resolution={512}
           />
 
-          {/* 5. Add an environment map for reflections */}
           <Environment preset="city" />
-
-          {/* 6. ADD ORBIT CONTROLS HERE */}
           <OrbitControls 
             enableZoom={false} 
             enablePan={false} 

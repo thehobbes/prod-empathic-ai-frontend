@@ -20,11 +20,12 @@ function normalizeWsBaseUrl(baseUrl) {
     .replace(/^https:/i, "wss:");
 }
 
-function buildSessionSocketUrl(baseUrl, sessionId) {
+function buildSessionSocketUrl(baseUrl, sessionId, sessionToken) {
   const normalizedBaseUrl = normalizeWsBaseUrl(baseUrl);
   const encodedSessionId = encodeURIComponent(sessionId);
+  const query = sessionToken ? `?session_token=${encodeURIComponent(sessionToken)}` : "";
 
-  return `${normalizedBaseUrl}/ws/session/${encodedSessionId}`;
+  return `${normalizedBaseUrl}/ws/session/${encodedSessionId}${query}`;
 }
 
 function createSocketError(message, details) {
@@ -53,6 +54,7 @@ function safeParseEnvelope(rawValue) {
 export function useBackendSocket(options = {}) {
   const {
     sessionId = null,
+    sessionToken = null,
     enabled = true,
     wsBaseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
     reconnect = true,
@@ -165,7 +167,7 @@ export function useBackendSocket(options = {}) {
     setError(null);
     setStatus(reconnectAttemptsRef.current > 0 ? "reconnecting" : "connecting");
 
-    const socket = new WebSocket(buildSessionSocketUrl(wsBaseUrl, sessionId));
+    const socket = new WebSocket(buildSessionSocketUrl(wsBaseUrl, sessionId, sessionToken));
     socketRef.current = socket;
 
     const handleEnvelope = (rawValue) => {
@@ -227,6 +229,19 @@ export function useBackendSocket(options = {}) {
         socketRef.current = null;
       }
 
+      if (event.code === 4401 || event.code === 4404) {
+        const nextError = createSocketError(
+          event.code === 4401
+            ? "The backend rejected the session websocket token."
+            : "The selected session was not found on the backend.",
+          { code: event.code, reason: event.reason },
+        );
+        setError(nextError);
+        setStatus("error");
+        onErrorRef.current?.(nextError);
+        return;
+      }
+
       if (manualDisconnectRef.current || !enabled || !sessionId) {
         setStatus((currentStatus) => (currentStatus === "offline" ? "offline" : "closed"));
         return;
@@ -268,6 +283,7 @@ export function useBackendSocket(options = {}) {
     maxReconnectDelayMs,
     reconnect,
     sessionId,
+    sessionToken,
     wsBaseUrl,
   ]);
 

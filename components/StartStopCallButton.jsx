@@ -25,7 +25,7 @@ export function deriveStartStopButtonState(voiceState, isBusy) {
     }
 
     if (voiceState === "connected") {
-        return { label: "End Session", disabled: false, intent: "stop" };
+        return { label: "Stop Session", disabled: false, intent: "stop" };
     }
 
     return { label: "Start Session", disabled: false, intent: "start" };

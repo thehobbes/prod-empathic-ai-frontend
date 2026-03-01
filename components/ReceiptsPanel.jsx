@@ -15,17 +15,22 @@
 export function formatReceiptListItem(receipt) {
     if (!receipt) return null;
 
-    const formattedSummary = receipt.toolName
-        ? receipt.toolName.replace(/_/g, ' ')
+    const toolName = receipt.toolName ?? receipt.tool_name ?? null;
+    const receiptId = receipt.receiptId ?? receipt.receipt_id ?? null;
+    const evidenceQuote = receipt.evidence?.quote ?? receipt.evidence_quote ?? "No explicit quote provided.";
+    const isVerified = receipt.evidence?.verified ?? receipt.verified ?? false;
+
+    const formattedSummary = toolName
+        ? toolName.replace(/_/g, ' ')
         : "Unknown Action";
 
     return {
-        receiptId: receipt.receiptId,
+        receiptId,
         summary: formattedSummary,
-        evidenceQuote: receipt.evidence?.quote || "No explicit quote provided.",
-        isVerified: receipt.evidence?.verified ?? false,
-        highlightNodeIds: Array.isArray(receipt.nodeIds) ? receipt.nodeIds : [],
-        highlightEdgeIds: Array.isArray(receipt.edgeIds) ? receipt.edgeIds : [],
+        evidenceQuote,
+        isVerified,
+        highlightNodeIds: Array.isArray(receipt.nodeIds) ? receipt.nodeIds : (receipt.applied_node_ids ?? []),
+        highlightEdgeIds: Array.isArray(receipt.edgeIds) ? receipt.edgeIds : (receipt.applied_edge_ids ?? []),
     };
 }
 
@@ -91,7 +96,7 @@ export default function ReceiptsPanel({
 
                                         {/* Evidence Quote Bubble */}
                                         <div className={`text-sm italic pl-3 border-l-2 ${isSelected ? "border-[#5BA87F] text-[#3A6048]" : "border-zinc-300 text-zinc-600"}`}>
-                                            "{formatted.evidenceQuote}"
+                                            &quot;{formatted.evidenceQuote}&quot;
                                         </div>
                                     </button>
                                 </li>

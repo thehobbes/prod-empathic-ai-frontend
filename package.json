@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@humeai/voice-react": "^0.2.14",
     "@p5-wrapper/next": "^3.0.1",
     "@p5-wrapper/react": "^5.0.2",
     "@react-three/drei": "^10.7.7",
@@ -17,6 +18,7 @@
     "maath": "^0.10.8",
     "next": "16.1.6",
     "p5": "^2.2.2",
+    "package.json": "^2.0.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-p5": "^1.4.1",

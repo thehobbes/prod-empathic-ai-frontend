@@ -111,7 +111,7 @@ export default function TranscriptPanel({ entries, showInterim = true }) {
                                             ? 'bg-[#3A6048] text-white rounded-2xl rounded-tl-sm'
                                             : 'bg-white text-gray-700 rounded-2xl rounded-tl-sm border border-gray-100'
                                         } ${entry.interim ? 'opacity-70' : 'opacity-100'}`}>
-                                        {entry.text}
+                                        {entry.text ?? entry.content ?? ""}
                                     </div>
                                 </div>
 
