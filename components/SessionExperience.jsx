@@ -10,7 +10,13 @@ import ProsodyPanel from "./ProsodyPanel";
 import ReceiptsPanel from "./ReceiptsPanel";
 import TranscriptPanel from "./TranscriptPanel";
 import VoicePanel from "./VoicePanel";
-import { createSession, endSession, getHumeAccessToken, getSessionGraphSnapshot, normalizeBackendEnvelope } from "../lib/api";
+import {
+  createSession,
+  endSession,
+  getHumeAccessToken,
+  getSessionFullGraphSnapshot,
+  normalizeBackendEnvelope,
+} from "../lib/api";
 import { deriveBackendWsBaseUrl } from "../lib/runtime";
 import { clearSessionRecord, persistSessionRecord, readSessionRecord, updateSessionRecord } from "../lib/sessionStore";
 import { prosodyScoresToSignals } from "../lib/graphTransform";
@@ -193,7 +199,7 @@ function SessionExperienceInner({ sessionId, apiBaseUrl, wsBaseUrl, humeConfigId
     setIsGraphLoading(true);
 
     try {
-      const snapshot = await getSessionGraphSnapshot({
+      const snapshot = await getSessionFullGraphSnapshot({
         baseUrl: apiBaseUrl,
         sessionId,
       });

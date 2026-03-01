@@ -675,10 +675,15 @@ import therapistLogo from "../assets/ai-therapist-logo.png";
 import AudioBubble from "../components/AudioBubble.jsx";
 import ConnectionStatus from "../components/ConnectionStatus.jsx";
 import GraphPanel from "../components/GraphPanel.jsx";
+import LatestProsodyBarChart from "../components/LatestProsodyBarChart.jsx";
 import TranscriptPanel from "../components/TranscriptPanel.jsx";
 import VoicePanel, { buildEviConnectionConfig } from "../components/VoicePanel.jsx";
-import ProsodyPanel from "../components/ProsodyPanel.jsx";
-import { createSession, getHumeAccessToken, getSessionGraphSnapshot, normalizeBackendEnvelope } from "../lib/api";
+import {
+  createSession,
+  getHumeAccessToken,
+  getSessionFullGraphSnapshot,
+  normalizeBackendEnvelope,
+} from "../lib/api";
 import { prosodyScoresToSignals } from "../lib/graphTransform";
 import { deriveBackendWsBaseUrl } from "../lib/runtime";
 import {
@@ -804,6 +809,7 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
 
   const processedMessageCountRef = useRef(0);
   const smoothedAudioLevelRef = useRef(0);
+  const fullGraphRefreshTimerRef = useRef(null);
 
   const syncSessionsFromStorage = useCallback(() => {
     const storedSessions = listSessionRecords();
@@ -867,6 +873,7 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
   });
   const forwardEviEvent = eventForwarder.forwardEvent;
   const resetEviForwarder = eventForwarder.resetForwarder;
+  const lastForwardedEvent = eventForwarder.lastForwardedEvent;
   const backendSocketStatus = backendSocket.status;
   const sendBackendEnvelope = backendSocket.sendEnvelope;
   const disconnectBackendSocket = backendSocket.disconnect;
@@ -902,7 +909,7 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
     syncSessionsFromStorage();
   }, [activeSession?.sessionId, syncSessionsFromStorage, voice.chatMetadata?.chatGroupId]);
 
-  const fetchGraphSnapshot = useCallback(
+  const fetchFullGraphSnapshot = useCallback(
       async (sessionId) => {
         if (!sessionId) {
           resetGraphState();
@@ -912,7 +919,7 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
         setIsGraphLoading(true);
 
         try {
-          const snapshot = await getSessionGraphSnapshot({
+          const snapshot = await getSessionFullGraphSnapshot({
             baseUrl: apiBaseUrl,
             sessionId,
           });
@@ -928,19 +935,51 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
       [apiBaseUrl, applyGraphSnapshot, resetGraphState],
   );
 
+  const scheduleFullGraphRefresh = useCallback(
+      (sessionId, delayMs = 650) => {
+        if (!sessionId) {
+          return;
+        }
+
+        if (fullGraphRefreshTimerRef.current) {
+          clearTimeout(fullGraphRefreshTimerRef.current);
+        }
+
+        fullGraphRefreshTimerRef.current = setTimeout(() => {
+          fullGraphRefreshTimerRef.current = null;
+          void fetchFullGraphSnapshot(sessionId);
+        }, delayMs);
+      },
+      [fetchFullGraphSnapshot],
+  );
+
+  useEffect(() => () => {
+    if (fullGraphRefreshTimerRef.current) {
+      clearTimeout(fullGraphRefreshTimerRef.current);
+    }
+  }, []);
+
   useEffect(() => {
     resetEviForwarder();
     clearVoiceMessages();
     processedMessageCountRef.current = 0;
-    void fetchGraphSnapshot(activeSession?.sessionId ?? null);
-  }, [activeSession?.sessionId, clearVoiceMessages, fetchGraphSnapshot, resetEviForwarder]);
+    void fetchFullGraphSnapshot(activeSession?.sessionId ?? null);
+  }, [activeSession?.sessionId, clearVoiceMessages, fetchFullGraphSnapshot, resetEviForwarder]);
 
   useEffect(() => {
     if (backendSocketStatus === "open" && activeSession?.sessionId) {
       sendBackendEnvelope("client.ping", {});
-      void fetchGraphSnapshot(activeSession.sessionId);
+      void fetchFullGraphSnapshot(activeSession.sessionId);
     }
-  }, [activeSession?.sessionId, backendSocketStatus, fetchGraphSnapshot, sendBackendEnvelope]);
+  }, [activeSession?.sessionId, backendSocketStatus, fetchFullGraphSnapshot, sendBackendEnvelope]);
+
+  useEffect(() => {
+    if (!activeSession?.sessionId || !lastForwardedEvent?.sentAtMs) {
+      return;
+    }
+
+    scheduleFullGraphRefresh(activeSession.sessionId, 900);
+  }, [activeSession?.sessionId, lastForwardedEvent?.sentAtMs, scheduleFullGraphRefresh]);
 
   const ensureAccessToken = useCallback(
       async (sessionId) => {
@@ -1190,7 +1229,7 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
                 alt="AI Therapist Logo"
                 className="w-12 h-12 object-contain"
             />
-            <span className="font-bold text-2xl">AI Therapist</span>
+            <span className="font-bold text-2xl">Evermind</span>
           </div>
 
           <button
@@ -1291,6 +1330,7 @@ function MainPageInner({ apiBaseUrl, humeConfigId }) {
           <div className="flex-1 min-h-0 overflow-hidden flex flex-col gap-4">
             {activeTab === "chat" ? (
                 <div className="flex-1 min-h-0 flex flex-col gap-4">
+                  <LatestProsodyBarChart signals={latestSignals} />
                   <div className="flex-1 min-h-0">
                     <TranscriptPanel entries={transcriptEntries} showInterim={true} />
                   </div>

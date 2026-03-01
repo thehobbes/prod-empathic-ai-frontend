@@ -31,7 +31,7 @@ export default function LatestProsodyBarChart({ signals }) {
   const bars = buildLatestProsodyBars(signals, 6);
 
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm flex flex-col h-full min-h-[250px]">
+    <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm flex shrink-0 flex-col min-h-[250px] max-h-[320px]">
       <div className="mb-5">
         <h2 className="text-sm font-semibold text-gray-800">Vocal Expression Scores</h2>
         <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-wider font-medium">
