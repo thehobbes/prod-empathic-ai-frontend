@@ -1,5 +1,6 @@
 "use client";
 
+import MainPage from "../pages/MainPage.jsx";
 /**
  * Request a new therapy session from the FastAPI backend and return the new session ID.
  *
@@ -57,34 +58,6 @@ export async function handleStartSessionClick(event) {
  */
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-zinc-50 p-8 text-zinc-900">
-      <section className="mx-auto flex max-w-3xl flex-col gap-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <header className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-zinc-500">
-            Empathic AI Therapy
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Voice session control room
-          </h1>
-          <p className="text-sm text-zinc-600">
-            Frontend skeleton for Hume EVI voice, backend KG updates, transcript,
-            prosody signals, graph, and receipts.
-          </p>
-        </header>
-
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-          This is a scaffold. The button handler and API integration are
-          intentionally unimplemented.
-        </div>
-
-        <button
-          type="button"
-          onClick={handleStartSessionClick}
-          className="inline-flex w-fit items-center rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white"
-        >
-          Start Session
-        </button>
-      </section>
-    </main>
+    <MainPage/>
   );
 }
