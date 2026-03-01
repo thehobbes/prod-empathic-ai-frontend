@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import therapistLogo from '../assets/ai-therapist-logo.png'; 
 import AudioBubble from '../components/AudioBubble.jsx';
 import ConnectionStatus from '../components/ConnectionStatus.jsx';
 import GraphPanel from '../components/GraphPanel.jsx';
@@ -9,9 +10,9 @@ import VoicePanel from '../components/VoicePanel.jsx';
 
 function MainPage() {
   // --- UI State ---
-  const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'graph'
+  const [activeTab, setActiveTab] = useState('chat');
 
-  // --- Mock Data (To be replaced by useSession/useGraphState hooks later) ---
+  // --- Mock Data ---
   const mockConnection = { backend: "connected", evi: "connected", lastError: null };
   
   const mockTranscript = [
@@ -40,15 +41,20 @@ function MainPage() {
       {/* 1. LEFT SIDEBAR */}
       <div className="w-64 bg-[#3F5546] flex flex-col h-full border-r border-[#526D5B] p-5 shrink-0 text-white">
         
-        {/* Logo */}
+        {/* Logo Implementation */}
         <div className="flex items-center gap-3 mb-8 px-1">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#4E9F76] to-[#2D6A4B]"></div>
-          <span className="font-bold text-xl">Orbital</span>
+          {/* 2. Replaced the div with an img tag using your imported asset */}
+          <img 
+            src={therapistLogo.src || therapistLogo} 
+            alt="AI Therapist Logo" 
+            className="w-12 h-12 object-contain"
+          />
+          <span className="font-bold text-2xl">AI Therapist</span>
         </div>
 
         {/* New Session Button */}
         <button className="w-full bg-[#89B399] text-[#3F5546] rounded-full py-2.5 mb-6 font-medium shadow-sm hover:bg-[#76A086] transition-colors flex items-center justify-center gap-2">
-          <span className="text-lg font-light">+</span> New Session
+          + New Session
         </button>
 
         {/* Sessions List */}
@@ -70,7 +76,6 @@ function MainPage() {
 
         {/* Connection Status Panel */}
         <div className="mt-4 shrink-0">
-          {/* You might need to adjust colors inside ConnectionStatus for the dark theme */}
           <ConnectionStatus connection={mockConnection} />
         </div>
 
@@ -86,27 +91,20 @@ function MainPage() {
         </div>
       </div>
 
-      {/* 2. CENTER AREA (Visualizer & Voice Controls) */}
+      {/* 2. CENTER AREA */}
       <div className="flex-1 flex flex-col items-center justify-between relative bg-[#DDE8D5] overflow-hidden pb-12">
-        
-        {/* The 3D Orb (Now stacked above) */}
         <div className="w-full flex-1 flex items-center justify-center pt-10 min-h-[400px]">
           <div className="w-full max-w-2xl h-[600px]">
             <AudioBubble />
           </div>
         </div>
-
-        {/* Voice Control Panel (Now sitting beneath the orb) */}
         <div className="w-full max-w-xl px-8 z-10 shrink-0">
           <VoicePanel sessionId="sess_12345abcde" />
         </div>
-
       </div>
 
-      {/* 3. RIGHT SIDEBAR (Dynamic Tab Interface) */}
+      {/* 3. RIGHT SIDEBAR */}
       <div className="w-[420px] bg-[#F4F3ED] flex flex-col h-full border-l border-[#E5E4DC] p-6 shrink-0">
-        
-        {/* Chat / Graph Toggle */}
         <div className="flex bg-[#E5E4DC] p-1.5 rounded-full mb-6 shrink-0 relative">
           <button 
             onClick={() => setActiveTab('chat')}
@@ -122,22 +120,17 @@ function MainPage() {
           </button>
         </div>
 
-        {/* Tab Content Area */}
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col gap-4">
-          
           {activeTab === 'chat' && (
             <div className="flex-1 min-h-0">
               <TranscriptPanel entries={mockTranscript} showInterim={true} />
             </div>
           )}
-
           {activeTab === 'graph' && (
             <div className="flex-1 min-h-0">
-              {/* Passed null to selectedReceiptId since we removed the receipts panel */}
               <GraphPanel graph={mockGraph} selectedReceiptId={null} />
             </div>
           )}
-
         </div>
       </div>
 
