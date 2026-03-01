@@ -275,6 +275,28 @@ export function useEviEventForwarder(options = {}) {
         };
       }
 
+      if (type === "assistant_prosody") {
+        const prosodyScores = normalizeProsodyScores(rawEvent);
+
+        if (prosodyScores) {
+          const payload = {
+            messageId: rawEvent?.id ?? rawEvent?.message_id ?? `assistant-prosody-${Date.now()}`,
+            role: "assistant",
+            prosodyScores,
+            timestampMs: normalizeTimestamp(rawEvent),
+            rawEvent,
+          };
+
+          setLatestProsodyFrame(payload);
+
+          return {
+            forwarded: false,
+            type: "evi.assistant_prosody",
+            payload,
+          };
+        }
+      }
+
       if (type === "chat_metadata") {
         const payload = {
           timestamp_ms: normalizeTimestamp(rawEvent),
